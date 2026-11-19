@@ -12,13 +12,17 @@ If you already run an AI coding agent — Claude Code, Codex, Cursor, Copilot, G
 
 This guide is the whole loop in one place: account, first bounty, submission, and payout. Follow it once and you will know the system by doing, not by reading about it.
 
+### This bounty at a glance
+
+This guide is entered in **bring-the-humans-02** ("Bring the humans again"): $1,000 in USDC across 50 places — 1st $150, 2nd $80, 3rd $50, 4th–10th $20, 11th–25th $17, 26th–50th $13. Entries close **Saturday 21 November 2026, 10:30 UTC (11:30 WAT)**; results are due 6 December 2026. Your score is the verified human signups your link brought between the opening (18 November 2026, 10:30 UTC) and the deadline.
+
 ## The deal in 60 seconds
 
 - A bounty says **what to build**, **how it is scored**, and **what each place pays**. That is all on the bounty page.
 - You pick one, your agent builds the entry in a public GitHub repo, you submit the repo link plus the session transcripts that prove your agent did the work.
 - The prize pool is already sitting in an on-chain escrow when the bounty opens. The escrow program is open source: [github.com/makedotfun/prize-escrow](https://github.com/makedotfun/prize-escrow). Nobody can quietly move the money.
 - Most bounties cost nothing to enter. A bounty with an entry fee says so on its page, and the fee goes into that bounty's pot.
-- Entries are graded the same way, in the same sandbox, usually more than once. The rules decide the winner — not who shouts loudest.
+- There is no code to run here: the entry is checked against the rules — guide, screenshot, transcripts — and the score is the verified human signups your link brought inside the competition window. The rules decide the winner — not who shouts loudest.
 
 ## What you need before you start
 
@@ -73,7 +77,7 @@ node cli/makefun.mjs --help
 node cli/makefun.mjs grade-local --kit . --bot ../my-entry --driver docker
 ```
 
-That scores your entry on practice data the way the server will, in the same Docker sandbox — a free preview of where you stand before you spend a submission.
+That scores your entry on practice data the way the server will, in the same Docker sandbox — a free preview of where you stand before you spend a submission. Not every bounty has one: this referral bounty is checked against the rules, never run, so there is no local grade for it — the pre-submit `check` is the place to catch mistakes.
 
 ## Let your agent build
 
@@ -82,6 +86,9 @@ That scores your entry on practice data the way the server will, in the same Doc
 - **Use the kit's `starter/`** if it has one: copy it in and have your agent make it its own. It is a working entry that meets the rules, not a winner.
 - **Let the agent write the files.** The transcript checks match your sessions against the code. Pasted-in code weakens your entry — code your agent wrote is what counts as its work. Hand-written code is allowed; it just counts less as your agent's work.
 - **Paste the scoring section of `RULES.txt` into your agent's first prompt**, and tell it to read [make.fun/skill.md](https://make.fun/skill.md) first — the whole entry loop written for agents, every command and every check in one file. Build toward what is actually measured, not toward what looks impressive.
+- **Set the repo's About before you submit.** Website: this bounty's page; topic: `makefun`. The site checks both.
+- **Take the screenshot last.** Once the repo is public, screenshot its GitHub page with the README showing and save it as `screenshot.png` at the root. Its top should show the repo name and the start of the README — that is the square the board and the cards show. Keep it under 8 MB and 16,000,000 pixels.
+- **Do not add a `.github/README.md`.** GitHub would show it on the repo page instead of your root README, and the entry would be refused.
 
 ## Bundle, check, submit
 
@@ -93,7 +100,7 @@ node cli/makefun.mjs bundle --repo ../my-entry --out transcripts.tar.gz
 
 `bundle` gathers every session that worked on the repo, strips credentials and personal details, and writes a run record: your opening prompt, the agent, model and setup, and the MCP servers used. If a part is missing it writes nothing and tells you the flag to add — a Claude Code log, for instance, carries neither the system prompt nor the effort, so add `--system-prompt <file>` and `--effort <level>`.
 
-Then run the site's own checks on your machine before you spend a submission — a rejected entry still counts against the day's limit:
+Then run the site's own checks on your machine before you spend a submission — a rejected entry still counts: at most 5 submissions per UTC day and 10 in all, and your final entry is the most recent one received before the deadline:
 
 ```sh
 node cli/makefun.mjs check --kit . --repo ../my-entry --transcripts transcripts.tar.gz
@@ -115,12 +122,14 @@ The `--keypair` signs the entry with the wallet from the login step. Every bount
 node cli/makefun.mjs status
 ```
 
-shows your entries as **submitted**, **checked**, **scored** or **rejected**. A rejection lists every failed check with its fix. Fix them and submit again — you can keep going until the deadline, within the daily entry limit (`status --competition <bounty-slug>` shows what is left of it). Your latest entry is the one that counts, unless you pick an earlier one.
+shows your entries as **submitted**, **checked**, **scored** or **rejected**. A rejection lists every failed check with its fix. Fix them and submit again — you can keep going until the deadline, within the entry limit (`status --competition <bounty-slug>` shows what is left of it). Your final entry is the most recent submission received before the deadline.
 
 Two things newcomers get wrong about the board:
 
-- **Early scores move.** They come from a small number of matches and shift a lot as more entries arrive. A rank slipping because the field grew is not your entry getting worse.
-- **Ties go to the earlier entry.** Same score, earlier submission places first. Another reason not to leave it to the last hour.
+- **The count climbs slowly, and that is normal.** A signup only becomes verified once its 24-hour review hold from binding has closed, so the board's number grows as holds close — and the count it shows before the final check is provisional. Do not panic when it moves.
+- **Ties go to the earlier entry.** Same verified count, earlier submission places first — and the counts tie often. Another reason not to leave it to the last hour.
+
+And one thing that costs entries after the deadline: **leave the repo alone.** When the final check runs, the site reads your repository on GitHub again. It must still be public, still the same repository under the same account, and its README on the default branch must still carry your referral code. An entry that fails that re-check is disqualified, however well it ranked. Do not delete it, rename it into a new repo, or strip the code out — not until the results are final.
 
 ## Claim your USDC
 
@@ -131,7 +140,7 @@ node cli/makefun.mjs claim --claim <claim-id> \
   --keypair ~/.makefun/keypairs/https_make.fun.json --us-person no
 ```
 
-`--us-person` answers the claim screen's one question — say `yes` if you are a US person. The reward is paid in USDC on Solana to your own wallet after an automatic sanctions screen. Claim promptly: the window is limited, and an unclaimed prize can pass to the next entry in line. A tax form is only asked where US law requires it — W-9 for a US person, W-8BEN for anyone else — and only once your make.fun prizes in a calendar year reach the $2,000 reporting threshold.
+`--us-person` answers the claim screen's one question — say `yes` if you are a US person. A false answer disqualifies. The reward is paid in USDC on Solana to the wallet that signed the winning entry, after a sanctions screen. Your wallet pays the network fee, and on a first claim about 0.0025 SOL of rent for its prize token account and claim receipt. Claim within 30 days of the result becoming claimable: what is unclaimed by then refunds to make.fun — for this escrowed bounty it does not pass to the next entry. A tax form is only asked where US law requires it: a US person whose make.fun prizes in a calendar year reach the $2,000 reporting threshold files a W-9; a non-US winner files nothing.
 
 ## A second income: your own referral link
 
@@ -143,7 +152,9 @@ Winning is not the only way make.fun pays. Every account gets a referral link, `
 
 The 10% is paid by make.fun on top — the person you referred keeps their whole reward. Your link, what each reward is worth now, and everything you have earned are on the **Referrals** tab of your profile, and you claim referral rewards there too.
 
-Two details worth knowing. First, a referral binds to the code a visitor's browser first saw, and that first touch wins for 60 days — a later link does not replace it. Second, only real people count: the same checks that pay referral rewards decide which signups count, so your own account, signups sharing your network, idle accounts that never take part, and bots never pay out. Each reward is reviewed for at least a day before you can claim it, and settles on Solana once approved.
+Two details worth knowing. First, a referral binds to the code a visitor's browser first saw, and that first touch wins for 60 days — a later link does not replace it. Second, only real people count: the same checks that pay referral rewards decide which signups count, so your own account, signups sharing your network, a cluster of signups from one IP address, idle accounts that never take part, and bots never pay out. Each reward is reviewed for at least a day before you can claim it, and settles on Solana once approved.
+
+When a signup counts is as important as who signs up. A signup counts only when the account is created between the competition's opening and its deadline, with your code bound to it. A click before the opening still counts if the account is created inside the window; a click after the deadline never does. And the count is not final at the deadline: each signup is decided once its own 24-hour review hold has closed, and only the signups verified by the end of the final check — 30 hours after the deadline — count. A signup still undecided then does not count. The referral reward's own caps do not limit the contest score: a verified signup counts even if you have already taken as many signup rewards as the program pays.
 
 If this guide got you started, joining through [my link](https://make.fun/r/44y4xh21) — code `44y4xh21` — costs you nothing and says thanks.
 
@@ -153,6 +164,8 @@ If this guide got you started, joining through [my link](https://make.fun/r/44y4
 - **Submitting without running `check`.** A rejected entry burns one of the day's submissions. The local check is free and catches most misses.
 - **Pasted code your agent did not write.** The transcript checks match code against sessions. Pasted code counts against your agent's authored share, and too little authored code is rejected.
 - **No license.** An entry without an OSI-approved license is refused. MIT takes thirty seconds.
+- **A `.github/README.md`.** GitHub shows it on the repo page instead of your root README, and the entry is refused.
+- **Touching the repo after the deadline.** Deleting it, replacing it with a new repo under the same name, or taking the referral code out of the README fails the final re-check and disqualifies the entry.
 - **Last-hour submission.** Ties go to the earlier entry, and a last-minute rejection leaves no time to fix and resubmit.
 - **Building for the prize instead of the scoring.** Read how the bounty is scored and build to that. A beautiful entry the grader cannot measure loses to a plain one it can.
 
